@@ -1,0 +1,111 @@
+1.4.1  OpenCV3丢失Nonfree模块的情况
+
+原因：
+
+with opencv3.0, SURF/SIFT and some other things have been moved to a seperate opencv_contrib repo .
+
+在opecv3.0中，SURF/SIFT 以及其它的一些东西被移动到了独立的库(opencv_contrib repo)中
+
+引自：http://stackoverflow.com/questions/27418668/nonfree-module-is-missing-in-opencv-3-0
+
+
+2 解决方法
+
+
+you will have to download that, add it to your main opencv cmake settings (please look at the readme there), and rerun cmake/make.
+
+then:
+
+你必须先下载opencv_contrib repo （地址：https://github.com/itseez/opencv_contrib/），然后把它添加到你的opencv cmake的设置中，然后运行cmake和make。
+
+#include "opencv2/xfeatures2d.hpp"
+ 
+...
+Ptr<SIFT> sift = cv::xfeatures2d::SIFT::create(...);
+sift->detect(...);
+引自：http://stackoverflow.com/questions/27418668/nonfree-module-is-missing-in-opencv-3-0
+3 编译方法
+
+引自：http://segmentfault.com/a/1190000003496009
+
+一、下载安装
+OpenCV3.0下载地址：http://sourceforge.net/projects/opencvlibrary/files/opencv-win/3.0.0/
+
+OpenCVcontrib下载地址：https://github.com/Itseez/opencvcontrib
+
+cmake-gui下载地址：http://www.cmake.org/cmake/resources/software.html
+
+下载以上内容并安装opencv和cmake-gui，我的OpenCV安装路径为D:\opencv3
+
+二、使用cmake生成OpenCV.sln
+打开cmake-gui
+
+在where is the source code选择opencv的安装目录，我的是D:\opencv3\opencv\sources
+
+在where to build the binaries里面选择要将opencv编译到的目录下面，我的是：D:\opencv3\opencv\mybuild
+
+点击configure，在弹出的对话框内选择 Visual Studio 2013和default参数，点击finish。
+
+这个时候cmake会开始编译不知道什么东西，然后会在屏幕中间出现一堆参数包括Name和Value，在其中找到Name为OPENCVEXTRAMODULESPATH的参数，然后把它的Value设置为opencvcontrib的路径，我的是D:/Files/Codes/Tracking/Exp/opencvcontrib-master/opencvcontrib-master/modules
+
+然后点击Generate，等待。中间报了两次错，我去掉了BUILDopencvadas和WITH_CUDA等一系列看起来没用的东西，然后就完成了。
+
+三、用VS编译生成debug和release库
+打开D:\opencv3\opencv\mybuild目录下的OpenCV.sln
+
+编译debug版本库：在“解决方案'OpenCV'（141个项目）”上面点击右键-->重新生成解决方案。
+
+找到CMakeTargets中的INSTALL，然后右键选择“仅限于项目”-->“仅生成INSTALL”，然后就在D:\opencv3\opencv\mybuild\install中发现了许多东东。
+
+四、重新配置自己的项目
+VC++目录-->包含目录，添加：
+D:\opencv3\opencv\mybuild\install\include
+
+VC++目录-->库目录，添加：
+D:\opencv3\opencv\mybuild\install\x86\vc12\lib
+D:\opencv3\opencv\mybuild\install\x86\vc12\staticlib
+
+链接器-->输入-->附加依赖项，添加：
+
+opencv_bgsegm300d.lib
+opencv_bioinspired300d.lib
+opencv_calib3d300d.lib
+opencv_ccalib300d.lib
+opencv_core300d.lib
+opencv_datasets300d.lib
+opencv_face300d.lib
+opencv_features2d300d.lib
+opencv_flann300d.lib
+opencv_hal300d.lib
+opencv_highgui300d.lib
+opencv_imgcodecs300d.lib
+opencv_imgproc300d.lib
+opencv_latentsvm300d.lib
+opencvlinedescriptor300d.lib
+opencv_ml300d.lib
+opencv_objdetect300d.lib
+opencv_optflow300d.lib
+opencv_photo300d.lib
+opencv_reg300d.lib
+opencv_rgbd300d.lib
+opencv_saliency300d.lib
+opencv_shape300d.lib
+opencv_stereo300d.lib
+opencv_stitching300d.lib
+opencv_superres300d.lib
+opencvsurfacematching300d.lib
+opencv_text300d.lib
+opencv_tracking300d.lib
+opencv_ts300d.lib
+opencv_video300d.lib
+opencv_videoio300d.lib
+opencv_videostab300d.lib
+opencv_xfeatures2d300d.lib
+opencv_ximgproc300d.lib
+opencv_xobjdetect300d.lib
+opencv_xphoto300d.lib
+ippicvmt.lib
+
+五、参考文献
+【1】https://github.com/Itseez/opencv_contrib/blob/master/README.md
+【2】http://www.huqiwen.com/2012/11/27/compile-opencv-243-in-visual-studio-2012/
